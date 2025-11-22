@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -17,81 +16,60 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnSOS, btnCall;
+    Button btnSOS, btnCall, btnTips;
 
-    // requiredPermissions
-    private final String[] requiredPermissions = new String[]{
+    String[] permissions = {
             Manifest.permission.SEND_SMS,
             Manifest.permission.CALL_PHONE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
 
-    // ActivityResultLauncher handle the permission request
-    private ActivityResultLauncher<String[]> permissionLauncher;
+    ActivityResultLauncher<String[]> permLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Connect the buttons from XML
         btnSOS = findViewById(R.id.btnSOS);
         btnCall = findViewById(R.id.btnCall);
+        btnTips = findViewById(R.id.btnTips);
 
-        // Register permission launcher
-        permissionLauncher = registerForActivityResult(
+        permLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(),
-                result -> Toast.makeText(this, "Permissions updated", Toast.LENGTH_SHORT).show()
+                result -> Toast.makeText(this, "Permissions Updated", Toast.LENGTH_SHORT).show()
         );
 
-        // Handle SOS button click
-        btnSOS.setOnClickListener(v -> ensurePermissionsThenRun(this::performFakeSOSAction));
-
-        // Handle Call button click
-        btnCall.setOnClickListener(v -> ensurePermissionsThenRun(() -> makeEmergencyCall("117")));
+        btnSOS.setOnClickListener(v -> checkPerm(() -> sendSOS()));
+        btnCall.setOnClickListener(v -> checkPerm(() -> callNumber("117")));
+        btnTips.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, SafetyTipsActivity.class))
+        );
     }
 
-    // Check permissions, then run the action
-    private void ensurePermissionsThenRun(Runnable action) {
-        boolean allGranted = true;
-        for (String permission : requiredPermissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                allGranted = false;
-                break;
-            }
+    private void checkPerm(Runnable action) {
+        boolean ok = true;
+        for (String p : permissions) {
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED)
+                ok = false;
         }
-
-        if (allGranted) {
-            action.run();
-        } else {
-            permissionLauncher.launch(requiredPermissions);
-            Toast.makeText(this, "Grant permissions and try again", Toast.LENGTH_LONG).show();
-        }
+        if (ok) action.run();
+        else permLauncher.launch(permissions);
     }
 
-    // Send a test SOS SMS
-    private void performFakeSOSAction() {
-        try {
-            String phoneNumber = "0123456789"; // 👈 Replace with your test number
-            String message = "🚨 SOS! I need help. (Test message from Women Safety App)";
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-            Toast.makeText(this, "Test SOS sent!", Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Toast.makeText(this, "Failed to send SMS", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
+    private void sendSOS() {
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage("0123456789", null,
+                "SOS! I need help. (Test Message)",
+                null, null);
+
+        Toast.makeText(this, "SOS Message Sent!", Toast.LENGTH_LONG).show();
     }
 
-    // Make a call to the emergency number
-    private void makeEmergencyCall(String number) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:" + number));
-            startActivity(intent);
-        } catch (SecurityException e) {
-            Toast.makeText(this, "Permission denied for CALL_PHONE", Toast.LENGTH_SHORT).show();
-        }
+    private void callNumber(String num) {
+        Intent i = new Intent(Intent.ACTION_CALL);
+        i.setData(Uri.parse("tel:" + num));
+        startActivity(i);
     }
 }
