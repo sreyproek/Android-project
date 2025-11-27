@@ -1,33 +1,53 @@
 package com.example.safetyapp;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
-import java.util.ArrayList;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SafetyTipsActivity extends AppCompatActivity {
 
-    RecyclerView rv;
-    ArrayList<SafetyTipModel> list;
-    SafetyTipsAdapter adapter;
+    private EditText etSearch;
+    private LinearLayout btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_safety_tips);
 
-        rv = findViewById(R.id.recyclerTips);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        initViews();
+        setupClickListeners();
+    }
 
-        list = new ArrayList<>();
-        list.add(new SafetyTipModel("Stay Alert", "Always observe surroundings.", R.drawable.ic_eye));
-        list.add(new SafetyTipModel("Avoid Dark Areas", "Stay in bright, busy places.", R.drawable.ic_street_light));
-        list.add(new SafetyTipModel("Share Location", "Share your live GPS location.", R.drawable.ic_location));
-        list.add(new SafetyTipModel("Emergency Numbers", "Keep 117 or 118 ready.", R.drawable.ic_phone));
+    private void initViews() {
+        etSearch = findViewById(R.id.etSearch);
+        btnBack = findViewById(R.id.btnBack);
+    }
 
-        adapter = new SafetyTipsAdapter(this, list);
-        rv.setAdapter(adapter);
+    private void setupClickListeners() {
+        // Back button
+        btnBack.setOnClickListener(v -> {
+            finish(); // Go back to main activity
+        });
+
+        // Best practice cards
+        findViewById(R.id.cardSituationalAwareness).setOnClickListener(v -> {
+            Toast.makeText(this, "Situational Awareness Tips", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.cardDigitalSafety).setOnClickListener(v -> {
+            Toast.makeText(this, "Digital Safety Best Practices", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.cardSafeTravel).setOnClickListener(v -> {
+            Toast.makeText(this, "Safe Travel Checklist", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.cardLocalResources).setOnClickListener(v -> {
+            Toast.makeText(this, "Local Safety Resources", Toast.LENGTH_SHORT).show();
+        });
     }
 }
