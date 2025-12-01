@@ -1,18 +1,17 @@
 package com.example.safetyapp;
 
-/**
- * Simple data model for a safety tip used by the adapter.
- */
 public class SafetyTipModel {
-    public String title;
-    public String description;
-    public int iconResId;
-    public int desc;
-    public int icon;
+    private int image;
+    private String title;
+    private String description;
 
-    public SafetyTipModel(String title, String description, int iconResId) {
+    public SafetyTipModel(int image, String title, String description) {
+        this.image = image;
         this.title = title;
         this.description = description;
-        this.iconResId = iconResId;
     }
+
+    public int getImage() { return image; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
 }

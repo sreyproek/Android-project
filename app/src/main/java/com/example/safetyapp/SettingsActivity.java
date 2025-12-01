@@ -34,74 +34,64 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        // Back button
-        btnBack.setOnClickListener(v -> {
-            finish(); // Go back to previous activity
-        });
+
+        // Back to Home
+        btnBack.setOnClickListener(v -> finish());
 
         // Emergency Contacts
         findViewById(R.id.cardEmergencyContacts).setOnClickListener(v -> {
-            Toast.makeText(this, "Emergency Contacts Settings", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Open Emergency Contacts Settings", Toast.LENGTH_SHORT).show();
         });
 
         // SOS Message
         findViewById(R.id.cardSOSMessage).setOnClickListener(v -> {
-            Toast.makeText(this, "SOS Message Settings", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Customize your SOS Message", Toast.LENGTH_SHORT).show();
         });
 
         // Notifications
         findViewById(R.id.cardNotifications).setOnClickListener(v -> {
-            Toast.makeText(this, "Notification Settings", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Notification Preferences", Toast.LENGTH_SHORT).show();
         });
 
         // Help & Support
         findViewById(R.id.cardHelpSupport).setOnClickListener(v -> {
-            Toast.makeText(this, "Help & Support", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Help & Support Center", Toast.LENGTH_SHORT).show();
         });
 
         // About
         findViewById(R.id.cardAbout).setOnClickListener(v -> {
-            Toast.makeText(this, "About this App", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "About this Application", Toast.LENGTH_SHORT).show();
         });
 
-        // Log Out
+        // Logout
         btnLogout.setOnClickListener(v -> {
-            showLogoutConfirmation();
+            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(this, MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            finish();
         });
     }
 
     private void setupSwitchListeners() {
+
         // Location Sharing Switch
-        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Toast.makeText(SettingsActivity.this, "Location Sharing Enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(SettingsActivity.this, "Location Sharing Disabled", Toast.LENGTH_SHORT).show();
-                }
+        switchLocation.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                Toast.makeText(this, "Location Sharing ON", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Location Sharing OFF", Toast.LENGTH_SHORT).show();
             }
         });
 
         // Dark Mode Switch
-        switchDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Toast.makeText(SettingsActivity.this, "Dark Mode Enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(SettingsActivity.this, "Dark Mode Disabled", Toast.LENGTH_SHORT).show();
-                }
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                Toast.makeText(this, "Dark Mode Enabled", Toast.LENGTH_SHORT).show();
+                // (Optional) Add real dark mode logic later
+            } else {
+                Toast.makeText(this, "Dark Mode Disabled", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void showLogoutConfirmation() {
-        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-        // Go back to main activity
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
     }
 }
