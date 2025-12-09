@@ -1,66 +1,62 @@
 package com.example.safetyapp;
 
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
+import java.util.List;
 
 public class SafetyTipsAdapter extends RecyclerView.Adapter<SafetyTipsAdapter.ViewHolder> {
 
-    Context context;
-    ArrayList<SafetyTipModel> list;
+    private List<SafetyTip> tipsList;
 
-    public SafetyTipsAdapter(Context context, ArrayList<SafetyTipModel> list) {
-        this.context = context;
-        this.list = list;
+    public SafetyTipsAdapter(List<SafetyTip> tipsList) {
+        this.tipsList = tipsList;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_safety_tip, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.item_safety_tip, parent, false);
-        return new ViewHolder(v);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        SafetyTip tip = tipsList.get(position);
+
+        // Set emoji as text
+        String emoji = getEmojiForPosition(position);
+        holder.iconText.setText(emoji);
+        holder.titleText.setText(tip.getTitle());
+        holder.descText.setText(tip.getDescription());
     }
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        SafetyTipModel item = list.get(position);
-
-        holder.image.setImageResource(item.getImage());
-        holder.title.setText(item.getTitle());
-        holder.desc.setText(item.getDescription());
-
-        holder.itemView.setOnClickListener(v -> {
-            Intent i = new Intent(context, TipDetailActivity.class);
-            i.putExtra("title", item.getTitle());
-            i.putExtra("description", item.getDescription());
-            i.putExtra("image", item.getImage());
-            context.startActivity(i);
-        });
+    private String getEmojiForPosition(int position) {
+        String[] emojis = {
+                "🔒", "🚶‍♀️", "📱", "👥", "🚗",
+                "🔑", "🚫", "📞", "🎒", "🧭",
+                "💡", "👀", "🗺️", "⏰", "🚨"
+        };
+        return emojis[position % emojis.length];
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return tipsList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView iconText, titleText, descText;
 
-        ImageView image;
-        TextView title, desc;
-
-        public ViewHolder(View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            image = itemView.findViewById(R.id.tipImage);
-            title = itemView.findViewById(R.id.tipTitle);
-            desc = itemView.findViewById(R.id.tipDesc);
+            iconText = itemView.findViewById(R.id.iconText);
+            titleText = itemView.findViewById(R.id.titleText);
+            descText = itemView.findViewById(R.id.descText);
         }
     }
 }

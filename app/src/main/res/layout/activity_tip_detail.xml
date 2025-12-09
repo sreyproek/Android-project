@@ -1,30 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="20dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8FAFC">
 
-    <ImageView
-        android:id="@+id/detailImage"
+    <!-- Header with Back Button -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:scaleType="centerCrop" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#4F46E5"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:elevation="8dp">
 
-    <TextView
-        android:id="@+id/detailTitle"
-        android:text="Tip Title"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <!-- Back Button -->
+        <LinearLayout
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
 
-    <TextView
-        android:id="@+id/detailDescription"
-        android:text="Full tip description here..."
-        android:textSize="16sp"
-        android:layout_marginTop="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="←"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tipNumberTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tip #1"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <!-- FIXED: ScrollView with proper weight -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Emoji Circle -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginBottom="32dp">
+
+                <LinearLayout
+                    android:id="@+id/emojiBackground"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="#E3F2FD"
+                    android:gravity="center"
+                    android:elevation="4dp">
+
+                    <TextView
+                        android:id="@+id/emojiTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔒"
+                        android:textSize="48sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Safety Tip Title"
+                android:textColor="#1E293B"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Details Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="24dp"
+                android:elevation="2dp">
+
+                <TextView
+                    android:id="@+id/detailsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Detailed safety information goes here..."
+                    android:textColor="#334155"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="8dp"/>
+            </LinearLayout>
+
+            <!-- Safety Note -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#FEF3C7"
+                android:padding="16dp"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💡"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="12dp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Your safety is our priority. Always trust your instincts."
+                    android:textColor="#92400E"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- EXTRA: Add more content to test scrolling -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="20dp"
+                android:layout_marginTop="24dp"
+                android:elevation="2dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Additional Tips"
+                    android:textColor="#1E293B"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Always trust your gut feeling\n• Learn basic self-defense moves\n• Keep emergency cash separate\n• Have a safety plan for different scenarios\n• Stay alert in parking lots\n• Don't overshare personal information\n• Use apps with safety features\n• Check in with family regularly\n• Keep car maintenance up to date\n• Avoid walking alone at night"
+                    android:textColor="#334155"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="6dp"/>
+            </LinearLayout>
+
+            <!-- Bottom padding for better scrolling -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>

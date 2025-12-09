@@ -2,144 +2,87 @@ package com.example.safetyapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SafetyTipsActivity extends AppCompatActivity {
-
-    EditText etSearch;
-
-    LinearLayout cardSituationalAwareness,
-            cardDigitalSafety,
-            cardSafeTravel,
-            cardLocalResources,
-            btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_safety_tips);
 
-        // Initialize
-        initViews();
+        // Setup back button
+        findViewById(R.id.backButton).setOnClickListener(v -> finish());
 
-        // Back button
-        btnBack.setOnClickListener(v -> finish());
-
-        // Card Click Listeners → open detail screen
-        cardSituationalAwareness.setOnClickListener(v ->
-                openDetail(
-                        "Situational Awareness",
-                        "Tips to stay alert and be aware of your surroundings. These practices help reduce risks in public spaces."
-                )
-        );
-
-        cardDigitalSafety.setOnClickListener(v ->
-                openDetail(
-                        "Digital Safety Best Practices",
-                        "Learn how to protect your online identity, secure your accounts, and browse safely."
-                )
-        );
-
-        cardSafeTravel.setOnClickListener(v ->
-                openDetail(
-                        "Safe Travel Checklist",
-                        "Important precautions for solo or group travel to ensure your journey stays safe."
-                )
-        );
-
-        cardLocalResources.setOnClickListener(v ->
-                openDetail(
-                        "Local Safety Resources",
-                        "Find nearby emergency services, support centers, and helpful community resources."
-                )
-        );
-
-        // Search bar filtering
-        setupSearchFilter();
+        // Setup tip click listeners
+        setupTipClickListeners();
     }
 
-    private void initViews() {
-        etSearch = findViewById(R.id.etSearch);
+    private void setupTipClickListeners() {
+        // Tip 1
+        findViewById(R.id.tip1).setOnClickListener(v ->
+                openTipDetail(1, "Lock Doors & Windows",
+                        "Always lock all doors and windows when leaving home or going to sleep. This is your first line of defense against intruders.\n\n• Lock main doors with deadbolts\n• Secure sliding doors with bars\n• Install window locks on all windows\n• Don't forget garage and basement access",
+                        "🔒")
+        );
 
-        btnBack = findViewById(R.id.btnBack);
+        // Tip 2
+        findViewById(R.id.tip2).setOnClickListener(v ->
+                openTipDetail(2, "Walk in Well-Lit Areas",
+                        "Stick to well-lit streets and avoid shortcuts through alleys or parks at night.\n\n• Plan your route in advance\n• Stay on main roads\n• Avoid isolated areas\n• Be aware of your surroundings",
+                        "🚶‍♀️")
+        );
 
-        cardSituationalAwareness = findViewById(R.id.cardSituationalAwareness);
-        cardDigitalSafety = findViewById(R.id.cardDigitalSafety);
-        cardSafeTravel = findViewById(R.id.cardSafeTravel);
-        cardLocalResources = findViewById(R.id.cardLocalResources);
+        // Tip 3
+        findViewById(R.id.tip3).setOnClickListener(v ->
+                openTipDetail(3, "Keep Phone Charged",
+                        "Always keep your phone charged and carry a power bank in emergencies.\n\n• Charge phone overnight\n• Carry portable charger\n• Enable battery saving mode\n• Save emergency numbers offline",
+                        "📱")
+        );
+
+        // Tip 4
+        findViewById(R.id.tip4).setOnClickListener(v ->
+                openTipDetail(4, "Share Your Location",
+                        "Let someone know where you're going and when you expect to return.\n\n• Share live location with family\n• Set check-in times\n• Update if plans change\n• Use safety apps with location sharing",
+                        "👥")
+        );
+
+        // Tip 5
+        findViewById(R.id.tip5).setOnClickListener(v ->
+                openTipDetail(5, "Check Your Car",
+                        "Before entering your car, check the back seat and around the vehicle.\n\n• Check under car and around\n• Look in back seat\n• Have keys ready\n• Lock doors immediately after entering",
+                        "🚗")
+        );
+
+        // Tip 6
+        findViewById(R.id.tip6).setOnClickListener(v ->
+                openTipDetail(6, "Keys Ready",
+                        "Have your keys ready before reaching your door or car to avoid fumbling.\n\n• Hold keys between fingers\n• Don't search in bag at door\n• Have separate car and house keys\n• Keep spare keys secure",
+                        "🔑")
+        );
+
+        // Tip 7
+        findViewById(R.id.tip7).setOnClickListener(v ->
+                openTipDetail(7, "Avoid Shortcuts",
+                        "Don't take shortcuts through dark areas, alleys, or construction sites.\n\n• Stick to familiar routes\n• Avoid poorly lit areas\n• Stay visible to others\n• Trust your instincts",
+                        "🚫")
+        );
+
+        // Tip 8
+        findViewById(R.id.tip8).setOnClickListener(v ->
+                openTipDetail(8, "Emergency Contacts",
+                        "Save emergency contacts with ICE prefix (In Case of Emergency).\n\n• Add ICE before contact names\n• Include local emergency numbers\n• Add family doctor number\n• Program quick dial shortcuts",
+                        "📞")
+        );
     }
 
-    // Opens the detail page with title + text
-    private void openDetail(String title, String content) {
-        Intent intent = new Intent(SafetyTipsActivity.this, TipDetailActivity.class);
-        intent.putExtra("title", title);
-        intent.putExtra("description", content);
+    private void openTipDetail(int tipId, String title, String details, String emoji) {
+        Intent intent = new Intent(this, TipDetailActivity.class);
+        intent.putExtra("TIP_ID", tipId);
+        intent.putExtra("TIP_TITLE", title);
+        intent.putExtra("TIP_DETAILS", details);
+        intent.putExtra("TIP_EMOJI", emoji);
         startActivity(intent);
-    }
-
-    // ----------------------------
-// SEARCH BAR FILTER
-// ----------------------------
-    private void setupSearchFilter() {
-
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String keyword = s.toString().toLowerCase().trim();
-                filterTips(keyword);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-    }
-
-    private void filterTips(String keyword) {
-
-        filterCard(cardSituationalAwareness, "situational awareness", keyword);
-        filterCard(cardDigitalSafety, "digital safety", keyword);
-        filterCard(cardSafeTravel, "safe travel", keyword);
-        filterCard(cardLocalResources, "local resources", keyword);
-
-        // Optional: If search is empty -> show all cards
-        if (keyword.isEmpty()) {
-            cardSituationalAwareness.setVisibility(LinearLayout.VISIBLE);
-            cardDigitalSafety.setVisibility(LinearLayout.VISIBLE);
-            cardSafeTravel.setVisibility(LinearLayout.VISIBLE);
-            cardLocalResources.setVisibility(LinearLayout.VISIBLE);
-        }
-    }
-
-    private void filterCard(LinearLayout card, String title, String keyword) {
-
-        if (title.contains(keyword)) {
-            card.setVisibility(LinearLayout.VISIBLE);
-            card.setAlpha(1f); // fully visible
-        } else {
-            if (keyword.isEmpty()) {
-                card.setVisibility(LinearLayout.VISIBLE); // show all when no search
-                card.setAlpha(1f);
-            } else {
-                card.setVisibility(LinearLayout.GONE); // hide not matched items
-            }
-        }
-    }
-
-    private void handleVisibility(LinearLayout card, String text, String keyword) {
-        if (text.contains(keyword)) {
-            card.setAlpha(1f);
-            card.setVisibility(LinearLayout.VISIBLE);
-        } else {
-            card.setAlpha(0.4f);
-            card.setVisibility(keyword.isEmpty() ? LinearLayout.VISIBLE : LinearLayout.GONE);
-        }
     }
 }

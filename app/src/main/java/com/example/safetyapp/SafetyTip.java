@@ -1,17 +1,17 @@
 package com.example.safetyapp;
 
-public class SafetyTipModel {
-    private int image;
+public class SafetyTip {
     private String title;
     private String description;
+    private int icon;
 
-    public SafetyTipModel(int image, String title, String description) {
-        this.image = image;
+    public SafetyTip(String title, String description, int icon) {
         this.title = title;
         this.description = description;
+        this.icon = icon;
     }
 
-    public int getImage() { return image; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
+    public int getIcon() { return icon; }
 }

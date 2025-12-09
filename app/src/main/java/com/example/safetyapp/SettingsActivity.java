@@ -1,97 +1,59 @@
 package com.example.safetyapp;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private LinearLayout btnBack;
-    private SwitchCompat switchLocation, switchDarkMode;
-    private Button btnLogout;
+    private EditText emergencyNumberEditText;
+    private SharedPreferences preferences;
+    private static final String PREFS_NAME = "SafetyAppPrefs";
+    private static final String KEY_EMERGENCY_NUMBER = "emergency_number";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        initViews();
-        setupClickListeners();
-        setupSwitchListeners();
+        // Initialize views
+        emergencyNumberEditText = findViewById(R.id.emergencyNumberEditText);
+        Button saveButton = findViewById(R.id.saveButton);
+
+        // Initialize SharedPreferences
+        preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        // Load saved emergency number
+        loadSavedSettings();
+
+        // Save button click listener
+        saveButton.setOnClickListener(v -> saveSettings());
+
+        // Back button click listener (top arrow)
+        findViewById(R.id.backButton).setOnClickListener(v -> finish());
     }
 
-    private void initViews() {
-        btnBack = findViewById(R.id.btnBack);
-        switchLocation = findViewById(R.id.switchLocation);
-        switchDarkMode = findViewById(R.id.switchDarkMode);
-        btnLogout = findViewById(R.id.btnLogout);
+    private void loadSavedSettings() {
+        String savedNumber = preferences.getString(KEY_EMERGENCY_NUMBER, "112");
+        emergencyNumberEditText.setText(savedNumber);
     }
 
-    private void setupClickListeners() {
+    private void saveSettings() {
+        String number = emergencyNumberEditText.getText().toString().trim();
 
-        // Back to Home
-        btnBack.setOnClickListener(v -> finish());
+        if (number.isEmpty()) {
+            Toast.makeText(this, "Please enter emergency number", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Emergency Contacts
-        findViewById(R.id.cardEmergencyContacts).setOnClickListener(v -> {
-            Toast.makeText(this, "Open Emergency Contacts Settings", Toast.LENGTH_SHORT).show();
-        });
+        // Save to SharedPreferences
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(KEY_EMERGENCY_NUMBER, number);
+        editor.apply();
 
-        // SOS Message
-        findViewById(R.id.cardSOSMessage).setOnClickListener(v -> {
-            Toast.makeText(this, "Customize your SOS Message", Toast.LENGTH_SHORT).show();
-        });
-
-        // Notifications
-        findViewById(R.id.cardNotifications).setOnClickListener(v -> {
-            Toast.makeText(this, "Notification Preferences", Toast.LENGTH_SHORT).show();
-        });
-
-        // Help & Support
-        findViewById(R.id.cardHelpSupport).setOnClickListener(v -> {
-            Toast.makeText(this, "Help & Support Center", Toast.LENGTH_SHORT).show();
-        });
-
-        // About
-        findViewById(R.id.cardAbout).setOnClickListener(v -> {
-            Toast.makeText(this, "About this Application", Toast.LENGTH_SHORT).show();
-        });
-
-        // Logout
-        btnLogout.setOnClickListener(v -> {
-            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(this, MainActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            finish();
-        });
-    }
-
-    private void setupSwitchListeners() {
-
-        // Location Sharing Switch
-        switchLocation.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                Toast.makeText(this, "Location Sharing ON", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Location Sharing OFF", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Dark Mode Switch
-        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                Toast.makeText(this, "Dark Mode Enabled", Toast.LENGTH_SHORT).show();
-                // (Optional) Add real dark mode logic later
-            } else {
-                Toast.makeText(this, "Dark Mode Disabled", Toast.LENGTH_SHORT).show();
-            }
-        });
+        Toast.makeText(this, "Settings saved successfully!", Toast.LENGTH_SHORT).show();
     }
 }

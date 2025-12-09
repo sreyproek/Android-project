@@ -1,15 +1,14 @@
 package com.example.safetyapp;
 
+import android.content.SharedPreferences;
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.telephony.SmsManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -21,212 +20,236 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    // UI
     private Button btnSOS;
-    private LinearLayout btnCall, btnLocation;
-
-    // State
+    private LinearLayout btnTipsCard, btnLocationCard;
+    private LinearLayout navTips, navSettings; // REMOVED: navAbout
     private boolean isSOSActive = false;
+    private SharedPreferences preferences;
+    private String emergencyNumber = "112"; // Default value
 
-    // Permissions
-    private final String[] permissions = {
-            Manifest.permission.SEND_SMS,
+    private final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CALL_PHONE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
 
-    // Emergency data
-    private final String emergencyNumber = "117";          // Police
-    private final String emergencyContactSMS = "012345678"; // Your emergency contact
-
-    ActivityResultLauncher<String[]> permissionLauncher;
+    private ActivityResultLauncher<String[]> permissionLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize UI
+        // Initialize views
         btnSOS = findViewById(R.id.btnSOS);
-        btnCall = findViewById(R.id.btnCall);
-        btnLocation = findViewById(R.id.btnLocation);
+        btnTipsCard = findViewById(R.id.btnTips);
+        btnLocationCard = findViewById(R.id.btnLocation);
+        navTips = findViewById(R.id.nav_safety_tips);
+        navSettings = findViewById(R.id.nav_settings);
+        // REMOVED: navAbout = findViewById(R.id.nav_about);
 
-        // Permission launcher
-        permissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestMultiplePermissions(),
-                result -> Toast.makeText(this, "Permissions Granted", Toast.LENGTH_SHORT).show()
-        );
+        // Initialize SharedPreferences
+        preferences = getSharedPreferences("SafetyAppPrefs", MODE_PRIVATE);
 
+        // Load saved emergency number
+        emergencyNumber = preferences.getString("emergency_number", "112");
+
+        // Setup permission launcher
+        setupPermissionLauncher();
+
+        // Setup click listeners
         setupClickListeners();
-        setupBottomNavigation();
+
+        // Check permissions on start
+        checkPermissions();
     }
 
-    // ============================================================
-    // CLICK HANDLERS
-    // ============================================================
-    private void setupClickListeners() {
+    private void setupPermissionLauncher() {
+        permissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                permissions -> {
+                    boolean allGranted = true;
+                    for (Boolean isGranted : permissions.values()) {
+                        if (!isGranted) {
+                            allGranted = false;
+                            break;
+                        }
+                    }
 
-        // SOS Button - Activate real SOS
+                    if (allGranted) {
+                        Toast.makeText(this, "Permissions granted!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this,
+                                "Some permissions denied. Emergency features may not work properly.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+    }
+
+    private void setupClickListeners() {
+        // SOS Button
         btnSOS.setOnClickListener(v -> {
-            if (isSOSActive) {
-                deactivateSOS();
+            if (!isSOSActive) {
+                if (hasAllPermissions()) {
+                    activateSOS();
+                } else {
+                    requestPermissions();
+                    Toast.makeText(this, "Please grant permissions first", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                checkPermissionsAndRun(() -> activateSOS());
+                deactivateSOS();
             }
         });
 
-        // INSTANT CALL
-        btnCall.setOnClickListener(v ->
-                checkPermissionsAndRun(() -> startEmergencyCall())
+        // Safety Tips Card
+        btnTipsCard.setOnClickListener(v ->
+                startActivity(new Intent(this, SafetyTipsActivity.class))
         );
 
-        // LIVE LOCATION SHARE
-        btnLocation.setOnClickListener(v ->
-                checkPermissionsAndRun(() -> sendLiveLocation())
+        // Location Card
+        btnLocationCard.setOnClickListener(v -> {
+            if (hasAllPermissions()) {
+                String location = getLocationText();
+                Toast.makeText(this, "Location: " + location, Toast.LENGTH_LONG).show();
+            } else {
+                requestPermissions();
+                Toast.makeText(this, "Need location permission", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Bottom Navigation
+        navTips.setOnClickListener(v ->
+                startActivity(new Intent(this, SafetyTipsActivity.class))
         );
+
+        navSettings.setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class))
+        );
+
+        // REMOVED: About navigation click listener
     }
 
-    // ============================================================
-    // NAVIGATION
-    // ============================================================
-    private void setupBottomNavigation() {
-
-        LinearLayout navTips = findViewById(R.id.nav_safety_tips);
-        LinearLayout navSettings = findViewById(R.id.nav_settings);
-
-        if (navTips != null) {
-            navTips.setOnClickListener(v ->
-                    startActivity(new Intent(MainActivity.this, SafetyTipsActivity.class))
-            );
+    // ... keep all other methods exactly as they were ...
+    private boolean hasAllPermissions() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
         }
-
-        if (navSettings != null) {
-            navSettings.setOnClickListener(v ->
-                    startActivity(new Intent(MainActivity.this, SettingsActivity.class))
-            );
-        }
+        return true;
     }
 
-    // ============================================================
-    // PERMISSIONS
-    // ============================================================
-    private void checkPermissionsAndRun(Runnable action) {
-        boolean allowed = true;
-
-        for (String p : permissions) {
-            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED)
-                allowed = false;
-        }
-
-        if (allowed) {
-            action.run();
-        } else {
-            permissionLauncher.launch(permissions);
+    private void checkPermissions() {
+        if (!hasAllPermissions()) {
+            requestPermissions();
         }
     }
 
-    // ============================================================
-    // SOS FUNCTIONALITY
-    // ============================================================
+    private void requestPermissions() {
+        permissionLauncher.launch(REQUIRED_PERMISSIONS);
+    }
+
     private void activateSOS() {
         isSOSActive = true;
-        btnSOS.setText("ACTIVE");
-        btnSOS.setBackgroundColor(0xFF475569); // dark gray
+        btnSOS.setText("CANCEL");
 
-        vibratePhone();
-        sendSOSMessage();
-        startEmergencyCall();
+        // Create blinking animation
+        ValueAnimator animator = ValueAnimator.ofFloat(0.6f, 1.0f);
+        animator.setDuration(500);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.setRepeatMode(ValueAnimator.REVERSE);
+        animator.addUpdateListener(animation -> {
+            float value = (float) animation.getAnimatedValue();
+            btnSOS.setAlpha(value);
+        });
+        animator.start();
 
-        Toast.makeText(this, "🚨 SOS Activated!", Toast.LENGTH_LONG).show();
+        // Store animator to stop later
+        btnSOS.setTag(animator);
+
+        // Call emergency and show location
+        callEmergencyNumber();
+        String location = getLocationText();
+
+        Toast.makeText(this,
+                "🚨 SOS ACTIVATED!\nEmergency services contacted.\n" + location,
+                Toast.LENGTH_LONG).show();
     }
 
     private void deactivateSOS() {
         isSOSActive = false;
         btnSOS.setText("SOS");
-        btnSOS.setBackgroundColor(0xFFEC4899); // Pink
+        btnSOS.setAlpha(1.0f);
 
-        Toast.makeText(this, "SOS Deactivated", Toast.LENGTH_SHORT).show();
-    }
-
-    private void vibratePhone() {
-        try {
-            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            if (v != null) v.vibrate(400);
-        } catch (Exception ignored) {}
-    }
-
-    private void sendSOSMessage() {
-        String location = getLocationText();
-
-        try {
-            SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(
-                    emergencyContactSMS,
-                    null,
-                    "🚨 SOS! I need help!\n" + location,
-                    null,
-                    null
-            );
-            Toast.makeText(this, "📩 SOS SMS Sent", Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Toast.makeText(this, "❌ SMS Failed", Toast.LENGTH_LONG).show();
+        // Stop animation
+        Object animator = btnSOS.getTag();
+        if (animator instanceof ValueAnimator) {
+            ((ValueAnimator) animator).cancel();
         }
+
+        Toast.makeText(this, "SOS deactivated", Toast.LENGTH_SHORT).show();
     }
 
-    private void startEmergencyCall() {
+    private void callEmergencyNumber() {
         try {
+            // Get current number from preferences
+            String currentNumber = preferences.getString("emergency_number", "112");
+
             Intent callIntent = new Intent(Intent.ACTION_CALL);
-            callIntent.setData(Uri.parse("tel:" + emergencyNumber));
-            startActivity(callIntent);
+            callIntent.setData(Uri.parse("tel:" + currentNumber));
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                startActivity(callIntent);
+            } else {
+                Toast.makeText(this, "Phone permission required", Toast.LENGTH_SHORT).show();
+            }
         } catch (Exception e) {
-            Toast.makeText(this, "❌ Call failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to make call: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    // ============================================================
-    // LIVE LOCATION
-    // ============================================================
-    private void sendLiveLocation() {
-        String location = getLocationText();
-
-        try {
-            SmsManager sms = SmsManager.getDefault();
-            sms.sendTextMessage(
-                    emergencyContactSMS,
-                    null,
-                    "📍 My Live Location:\n" + location,
-                    null,
-                    null
-            );
-            Toast.makeText(this, "📩 Location Sent!", Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Toast.makeText(this, "❌ Failed to send location", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    // ============================================================
-    // LOCATION HANDLER
-    // ============================================================
-    @SuppressLint("MissingPermission")
     private String getLocationText() {
-        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Location location = null;
-
         try {
-            if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-            if (location == null) {
-                location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
-        } catch (Exception ignored) {}
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        if (location != null) {
-            return "https://maps.google.com/?q=" +
-                    location.getLatitude() + "," + location.getLongitude();
+            if (locationManager == null) {
+                return "Location service not available";
+            }
+
+            // Check permission
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return "Location permission required";
+            }
+
+            Location location = null;
+
+            // Try to get last known location from GPS
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+
+            // If GPS not available, try network
+            if (location == null && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+
+            if (location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                return String.format("📍 Location:\nhttps://maps.google.com/?q=%.6f,%.6f",
+                        latitude, longitude);
+            } else {
+                return "Location not available. Enable GPS.";
+            }
+
+        } catch (SecurityException e) {
+            return "Location permission denied";
+        } catch (Exception e) {
+            return "Error getting location";
         }
-
-        return "⚠ GPS Off / Location unavailable";
     }
 }
