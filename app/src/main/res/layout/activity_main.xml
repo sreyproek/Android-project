@@ -3,16 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white"
-    android:padding="24dp">
+    android:background="#F5F5F5"
+    android:orientation="vertical">
 
-    <!-- Header -->
+    <!-- Header Section (Full Width, White Background) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
         android:orientation="horizontal"
-        android:layout_marginBottom="32dp">
+        android:padding="20dp"
+        android:gravity="center_vertical">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -24,210 +26,240 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hello,"
-                android:textColor="#666666"
-                android:textSize="14sp"
-                android:textStyle="normal"/>
+                android:textColor="#757575"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/tvUserName"
+                android:id="@+id/tvWelcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Stay Safe"
-                android:textColor="#1E293B"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginTop="2dp"/>
+                android:textColor="#333333"
+                android:textSize="22sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Status Indicator -->
+        <!-- Status Indicator (Ready/Locating/Shared) -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:background="@drawable/rounded_status_bg"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
+            android:gravity="center"
+            android:paddingStart="12dp"
             android:paddingTop="6dp"
-            android:paddingBottom="6dp"
-            android:gravity="center">
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp">
 
+            <!-- ID REQUIRED BY JAVA: viewStatusDot -->
             <View
+                android:id="@+id/viewStatusDot"
                 android:layout_width="8dp"
                 android:layout_height="8dp"
-                android:background="@drawable/rounded_green_dot"
-                android:layout_marginEnd="6dp"/>
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/rounded_green_dot" />
 
+            <!-- ID REQUIRED BY JAVA: tvStatusText -->
             <TextView
+                android:id="@+id/tvStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ready"
                 android:textColor="#2E7D32"
                 android:textSize="12sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Main SOS Card -->
-    <LinearLayout
+    <!-- Scrollable Main Content -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/sos_card_background"
-        android:elevation="4dp"
-        android:padding="32dp"
-        android:gravity="center"
-        android:layout_marginBottom="32dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🚨"
-            android:textSize="48sp"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/btnSOS"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:background="@drawable/btn_sos_background"
-            android:text="SOS"
-            android:textColor="@android:color/white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:elevation="8dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tap in emergency"
-            android:textColor="#666666"
-            android:textSize="14sp"
-            android:layout_marginTop="16dp"/>
-    </LinearLayout>
-
-    <!-- Quick Actions Title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Quick Actions"
-        android:textColor="#1E293B"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Quick Actions Grid -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="32dp"
-        android:weightSum="2">
-
-        <!-- Safety Tips Card -->
         <LinearLayout
-            android:id="@+id/btnTips"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
             android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:elevation="2dp"
-            android:padding="20dp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true">
+            android:padding="24dp">
 
-            <LinearLayout
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/rounded_tips_bg"
-                android:gravity="center"
-                android:layout_marginBottom="12dp">
+            <!-- Main SOS Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📚"
-                    android:textSize="24sp"/>
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="32dp">
+
+                    <!-- Add this NEW button -->
+                    <Button
+                        android:id="@+id/btnNearbyServices"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="#FF6B6B"
+                        android:text="🚨 Find Nearby Emergency Services"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF" />
+
+                    <!-- Main SOS Button -->
+                    <Button
+                        android:id="@+id/btnSOS"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="40dp"
+                        android:layout_marginBottom="40dp"
+                        android:background="@drawable/btn_sos_background"
+                        android:text="SOS"
+                        android:textColor="#FFFFFF"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:elevation="8dp"
+                        android:stateListAnimator="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Tap in emergency"
+                        android:textColor="#757575"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Quick Actions Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Quick Actions"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Quick Actions Grid -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <!-- Safety Tips Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btnTips"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:text="📚"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Safety Tips"
+                            android:textColor="#333333"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Learn safety"
+                            android:textColor="#757575"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Location Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btnLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp"
+                            android:text="📍"
+                            android:textSize="32sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Location"
+                            android:textColor="#333333"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <!-- ID REQUIRED BY JAVA: tvLocationSubtitle -->
+                        <TextView
+                            android:id="@+id/tvLocationSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Share location"
+                            android:textColor="#757575"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Safety Tips"
-                android:textColor="#1E293B"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Learn safety"
-                android:textColor="#666666"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"/>
         </LinearLayout>
+    </ScrollView>
 
-        <!-- Location Card -->
-        <LinearLayout
-            android:id="@+id/btnLocation"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:elevation="2dp"
-            android:padding="20dp"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true">
-
-            <LinearLayout
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/rounded_location_bg"
-                android:gravity="center"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📍"
-                    android:textSize="24sp"/>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Location"
-                android:textColor="#1E293B"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Share location"
-                android:textColor="#666666"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"/>
-        </LinearLayout>
-    </LinearLayout>
-
-
-    <!-- Bottom Navigation -->
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (Fixed at bottom) -->
     <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:elevation="16dp"
         android:orientation="horizontal"
-        android:background="@drawable/nav_background"
-        android:elevation="8dp"
-        android:layout_marginTop="32dp"
         android:paddingTop="12dp"
         android:paddingBottom="12dp">
 
@@ -237,25 +269,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="12dp"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="📚"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Tips"
-                android:textColor="#666666"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"/>
+                android:textColor="#757575"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <!-- Settings Navigation -->
@@ -264,25 +296,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="12dp"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⚙️"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="Settings"
-                android:textColor="#666666"
-                android:textSize="12sp"
-                android:layout_marginTop="4dp"/>
+                android:textColor="#757575"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>

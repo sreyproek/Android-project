@@ -1,59 +1,58 @@
 package com.example.safetyapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.text.TextUtils;import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private EditText emergencyNumberEditText;
+    private EditText etEmergencyNumber;
+    private Button btnSave, btnLogout;
     private SharedPreferences preferences;
-    private static final String PREFS_NAME = "SafetyAppPrefs";
-    private static final String KEY_EMERGENCY_NUMBER = "emergency_number";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Initialize views
-        emergencyNumberEditText = findViewById(R.id.emergencyNumberEditText);
-        Button saveButton = findViewById(R.id.saveButton);
+        // Initialize Views
+        etEmergencyNumber = findViewById(R.id.etEmergencyNumber);
+        btnSave = findViewById(R.id.btnSave);
+        btnLogout = findViewById(R.id.btnLogout);
 
-        // Initialize SharedPreferences
-        preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        preferences = getSharedPreferences("SafetyAppPrefs", MODE_PRIVATE);
 
-        // Load saved emergency number
-        loadSavedSettings();
+        // Load existing number
+        String currentNumber = preferences.getString("emergency_number", "");
+        etEmergencyNumber.setText(currentNumber);
 
-        // Save button click listener
-        saveButton.setOnClickListener(v -> saveSettings());
+        // Save Button Logic
+        btnSave.setOnClickListener(v -> {
+            String number = etEmergencyNumber.getText().toString().trim();
+            if (TextUtils.isEmpty(number)) {
+                Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
+            } else {
+                preferences.edit().putString("emergency_number", number).apply();
+                Toast.makeText(this, "Emergency Number Saved!", Toast.LENGTH_SHORT).show();
+                finish(); // Go back to main screen
+            }
+        });
 
-        // Back button click listener (top arrow)
-        findViewById(R.id.backButton).setOnClickListener(v -> finish());
-    }
+        // Logout Button Logic
+        btnLogout.setOnClickListener(v -> {
+            // Clear all data
+            preferences.edit().clear().apply();
 
-    private void loadSavedSettings() {
-        String savedNumber = preferences.getString(KEY_EMERGENCY_NUMBER, "112");
-        emergencyNumberEditText.setText(savedNumber);
-    }
-
-    private void saveSettings() {
-        String number = emergencyNumberEditText.getText().toString().trim();
-
-        if (number.isEmpty()) {
-            Toast.makeText(this, "Please enter emergency number", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Save to SharedPreferences
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(KEY_EMERGENCY_NUMBER, number);
-        editor.apply();
-
-        Toast.makeText(this, "Settings saved successfully!", Toast.LENGTH_SHORT).show();
+            // Return to Login Screen
+            Intent intent = new Intent(this, LoginActivity.class);
+            // Clear the back stack so user can't press back to return to the app
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
     }
 }
